@@ -1,0 +1,49 @@
+// Prisma Schema para KOF Assistant
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Cambia a "postgresql" o "mysql" en producción
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  username      String         @unique
+  password      String
+  fullName      String?
+  avatarUrl     String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  conversations Conversation[]
+
+  @@map("users")
+}
+
+model Conversation {
+  id        String    @id @default(uuid())
+  title     String    @default("Nueva conversación")
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages  Message[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("conversations")
+  @@index([userId])
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           String // "user" o "assistant"
+  content        String
+  createdAt      DateTime     @default(now())
+
+  @@map("messages")
+  @@index([conversationId])
+}

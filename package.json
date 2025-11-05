@@ -1,0 +1,38 @@
+{
+  "name": "kof-auth-backend",
+  "version": "1.0.0",
+  "description": "Backend de autenticación y gestión de usuarios para KOF Assistant",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate": "prisma migrate dev",
+    "generate": "prisma generate",
+    "studio": "prisma studio"
+  },
+  "keywords": ["kof", "authentication", "chat", "backend"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.20.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-validator": "^7.2.0",
+    "jsonwebtoken": "^9.0.2",
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.8.6",
+    "nodemon": "^3.1.7",
+    "prisma": "^5.20.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
