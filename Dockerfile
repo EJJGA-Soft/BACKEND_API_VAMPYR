@@ -30,8 +30,8 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm ci --only=production
 
-# Copy prisma schema
-COPY prisma ./prisma/
+# Copy prisma schema AND migrations folder
+COPY --from=builder /usr/src/app/prisma ./prisma/
 
 # Copy built application from builder
 COPY --from=builder /usr/src/app/dist ./dist
@@ -55,5 +55,5 @@ EXPOSE 3000
 # Set environment
 ENV NODE_ENV=production
 
-# Start the application
-CMD ["node", "dist/index.js"]
+# Run migrations and start the application
+CMD npx prisma migrate deploy && node dist/index.js

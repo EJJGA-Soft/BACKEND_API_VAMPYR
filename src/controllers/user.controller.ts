@@ -69,6 +69,11 @@ export const updatePassword = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
+    // Si el usuario no tiene contraseña (creado vía QR), informar que primero debe establecer una
+    if (!user.password) {
+      return res.status(400).json({ error: 'No hay contraseña establecida para esta cuenta. Usa la opción para establecer una contraseña.' });
+    }
+
     const isValidPassword = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Contraseña actual incorrecta' });
@@ -98,5 +103,64 @@ export const deleteAccount = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error('Error al eliminar cuenta:', error);
     res.status(500).json({ error: 'Error al eliminar cuenta' });
+  }
+};
+
+/**
+ * OBTENER TODOS LOS USUARIOS CON SUS JUGADORES VINCULADOS
+ * Útil para administración y debugging
+ */
+export const getAllUsersWithPlayers = async (req: AuthRequest, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        fullName: true,
+        createdAt: true,
+        players: {
+          select: {
+            id: true,
+            username: true,
+            level: true,
+            enemiesDefeated: true,
+            defeats: true,
+            playTime: true,
+            unlockedItems: true,
+            achievements: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                points: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    // Transformar para mostrar solo el primer player (en práctica solo hay 1 por usuario)
+    const usersFormatted = users.map(u => ({
+      ...u,
+      player: u.players.length > 0 ? u.players[0] : null,
+      players: undefined // Remover el array
+    }));
+
+    const stats = {
+      totalUsers: users.length,
+      usersWithPlayer: users.filter(u => u.players.length > 0).length,
+      usersWithoutPlayer: users.filter(u => u.players.length === 0).length
+    };
+
+    res.json({ 
+      stats,
+      users: usersFormatted
+    });
+  } catch (error) {
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 };

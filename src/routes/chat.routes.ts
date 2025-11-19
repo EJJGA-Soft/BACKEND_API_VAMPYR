@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { sendMessage } from '../controllers/chat.controller';
+import { sendMessageToRAG } from '../controllers/chat.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.use(authenticateToken);
-
-router.post('/message', sendMessage);
+// Endpoint para enviar mensajes al chatbot RAG
+router.post('/message', authenticateToken, sendMessageToRAG);
 
 export default router;

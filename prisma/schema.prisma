@@ -11,14 +11,15 @@ datasource db {
 
 model User {
   id            String         @id @default(uuid())
-  email         String         @unique
+  email         String?        @unique
   username      String         @unique
-  password      String
+  password      String?
   fullName      String?
   avatarUrl     String?
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
   conversations Conversation[]
+  players       Player[]
 
   @@map("users")
 }
@@ -46,4 +47,86 @@ model Message {
 
   @@map("messages")
   @@index([conversationId])
+}
+
+model Player {
+  id              Int      @id @default(autoincrement())
+  username        String   @unique
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  // Estadísticas y progreso para juego de 3 niveles
+  level           Int      @default(1) // máximo 3
+  enemiesDefeated Int      @default(0) // máximo 6
+  defeats         Int      @default(0) // número de derrotas / intentos fallidos
+  playTime        Int      @default(0) // en segundos
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  unlockedItems   Item[]        @relation("PlayerItems") // máximo 6 espadas
+  achievements    Achievement[] @relation("PlayerAchievements")
+  loginCodes      LoginCode[] // Códigos QR temporales
+
+  @@map("players")
+}
+
+model LoginCode {
+  id        Int      @id @default(autoincrement())
+  code      String   @unique // ej: "ABC123"
+  player    Player   @relation(fields: [playerId], references: [id])
+  playerId  Int
+  expiresAt DateTime
+  used      Boolean  @default(false)
+
+  @@index([code])
+  @@map("login_codes")
+}
+
+model Item {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  itemType    String   @default("weapon") // weapon, armor, consumable, special
+  rarity      String   @default("common") // common, rare, epic, legendary
+  players     Player[] @relation("PlayerItems")
+
+  @@map("items")
+}
+
+model Character {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  rarity      String  @default("common")
+  // no relation to players in simplified schema
+
+  @@map("characters")
+}
+
+model Achievement {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  icon        String?
+  points      Int      @default(10)
+  players     Player[] @relation("PlayerAchievements")
+
+  @@map("achievements")
+}
+
+model Lead {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  subject   String?
+  message   String
+  status    String   @default("new") // new, contacted, converted, archived
+  source    String   @default("landing") // landing, game, app
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("leads")
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
 }

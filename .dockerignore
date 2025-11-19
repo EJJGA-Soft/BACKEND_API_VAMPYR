@@ -8,10 +8,11 @@ dist
 .env.*.local
 README.md
 .vscode
+# NO excluir .env.prod
 .idea
 *.log
 coverage
 .DS_Store
 prisma/dev.db
 prisma/prod.db
-prisma/migrations
+# prisma/migrations 
