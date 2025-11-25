@@ -33,11 +33,11 @@ pipeline {
             steps {
                 withSonarQubeEnv('node-token') {
                     sh """
-                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \ 
-                    -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://74.208.227.171:9000 \ 
-                    -Dsonar.login=${SONAR_TOKEN}
+                    ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://74.208.227.171:9000 \
+                        -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
             }
