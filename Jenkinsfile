@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout Git Repository') {
             steps {
-                git branch : 'main', credentialsId: 'shh-git-frankrojas31', url: 'https://github.com/EJJGA-Soft/BACKEND_API_VAMPYR.git'
+                git branch : 'main', credentialsId: 'shh-git-frankrojas31', url: 'https://github.com/EJJGA-Soft/BACKEND_API_VAMPYR'
             }
         }
         
