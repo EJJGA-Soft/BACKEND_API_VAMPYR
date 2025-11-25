@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
     environment {
         SONARQUBE = 'sonarqube'
         SCANNER = 'sonar-scanner'
