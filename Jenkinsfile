@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         SONAR_PROJECT_KEY = 'vampyr-backend-api'
-        SONAR_TOKEN = tool 'SonarQube'
+        SONAR_TOKEN = tool 'SonnarQube'
         SONAR_SCANNER_HOME = tool 'SonarScanner'
     }
 
