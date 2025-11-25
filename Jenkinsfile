@@ -1,6 +1,15 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS'
+    }
+
+    environment {
+        SONAR_PROJECT_KEY = 'vampyr-backend-api'
+        SONAR_TOKEN = tool 'SonnarQube'
+    }
+
     stages {
         stage('Chekout Git Repository') {
             steps {
@@ -27,7 +36,7 @@ pipeline {
                     ${SONAR_SCANNER_HOME}/bin/sonar-scanner \ 
                     -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
                     -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000 \ 
+                    -Dsonar.host.url=http://74.208.227.171:9000 \ 
                     -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
@@ -45,6 +54,17 @@ pipeline {
             steps {
                 echo 'Deploying...'
             }
+        }
+    }
+    post {
+        always {
+            echo 'This will always run after the stages finish.'
+        }
+        success {
+            echo 'This will run only if the pipeline succeeds.'
+        }
+        failure {
+            echo 'This will run only if the pipeline fails.'
         }
     }
 }
