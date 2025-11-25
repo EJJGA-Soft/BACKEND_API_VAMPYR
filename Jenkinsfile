@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         SONAR_PROJECT_KEY = 'vampyr-backend-api'
-        SONAR_SCANNER_HOME = tool 'SonnarQube'
+        SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
     }
 
     stages {
@@ -32,7 +32,7 @@ pipeline {
         stage('Sonarqube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'node-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('node-token') {
+                    withSonarQubeEnv('SonarQubeServer') {
                         sh """
                         ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
                             -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
