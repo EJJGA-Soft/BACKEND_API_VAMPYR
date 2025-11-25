@@ -7,17 +7,18 @@ pipeline {
 
     environment {
         SONAR_PROJECT_KEY = 'vampyr-backend-api'
-        SONAR_TOKEN = tool 'SonnarQube'
+        SONAR_TOKEN = tool 'SonarQube'
+        SONAR_SCANNER_HOME = tool 'SonarScanner'
     }
 
     stages {
-        stage('Chekout Git Repository') {
+        stage('Checkout Git Repository') {
             steps {
                 git branch : 'main', credentialsId: 'shh-git-frankrojas31', url: 'https://github.com/EJJGA-Soft/BACKEND_API_VAMPYR.git'
             }
         }
         
-        stage('install Dependencies') {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
