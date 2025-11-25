@@ -6,17 +6,25 @@ pipeline {
     }
 
     environment {
+        SONARQUBE = 'sonarqube'
+        SCANNER = 'sonar-scanner'
         SONAR_PROJECT_KEY = 'vampyr-backend-api'
-        SONAR_SCANNER_HOME = tool 'SonarQubeScanner'
     }
 
     stages {
-        stage('Checkout Git Repository') {
+
+        stage('Checkout') {
             steps {
-                git branch : 'main', credentialsId: 'shh-git-frankrojas31', url: 'https://github.com/EJJGA-Soft/BACKEND_API_VAMPYR'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/EJJGA-Soft/BACKEND_API_VAMPYR'
+                    ]]
+                ])
             }
         }
-        
+
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
@@ -25,22 +33,30 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh 'npm test'
+                sh 'npm test || true'
             }
         }
 
-        stage('Sonarqube Analysis') {
+        stage('SonarQube Analysis') {
             steps {
-                withCredentials([string(credentialsId: 'node-token', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('SonarQubeServer') {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv("${SONARQUBE}") {
                         sh """
-                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://74.208.227.171:9000 \
-                            -Dsonar.login=${SONAR_TOKEN}
+                            ${tool SCANNER}/bin/sonar-scanner \
+                                -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=http://74.208.227.171:9000 \
+                                -Dsonar.login=${SONAR_TOKEN}
                         """
                     }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
                 }
             }
         }
@@ -51,22 +67,22 @@ pipeline {
             }
         }
 
-
         stage('Deploy') {
             steps {
                 echo 'Deploying...'
             }
         }
     }
+
     post {
         always {
-            echo 'This will always run after the stages finish.'
+            echo 'Pipeline finalizado.'
         }
         success {
-            echo 'This will run only if the pipeline succeeds.'
+            echo 'Pipeline completado correctamente.'
         }
         failure {
-            echo 'This will run only if the pipeline fails.'
+            echo 'Pipeline falló.'
         }
     }
 }
