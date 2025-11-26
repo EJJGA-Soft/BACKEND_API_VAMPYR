@@ -16,7 +16,7 @@ pipeline {
     }
 
     stages {
-        stage('Stop') {
+        stage('Stop if not main branch') {
             when {
                 not {
                     branch 'main'
