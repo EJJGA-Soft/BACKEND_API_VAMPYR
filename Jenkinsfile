@@ -17,16 +17,15 @@ pipeline {
 
     stages {
         stage('Stop if not main branch') {
-            when {
-                not {
-                    branch 'main'
-                }
-            }
             steps {
-                echo "Push recibido, pero NO es main. Cancelando pipeline."
-                script { 
-                    currentBuild.result = 'ABORTED'
-                    error("Stop: No es main")
+                script {
+                    if (env.GIT_BRANCH != 'origin/main' && env.BRANCH_NAME != 'main') {
+                        echo "Push recibido, pero NO es main. Cancelando pipeline."
+                        currentBuild.result = 'ABORTED'
+                        error("Stop: No es main")
+                    } else {
+                        echo "Es main, continuamos."
+                    }
                 }
             }
         }
