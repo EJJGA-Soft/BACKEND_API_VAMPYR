@@ -61,15 +61,28 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Deploy to Server') {
             steps {
-                sh 'npm run build'
-            }
-        }
+                script {
+                    withCredentials([
+                        usernamePassword(
+                            credentialsId: 'deploy-server-credentials',
+                            usernameVariable: 'SSH_USER',
+                            passwordVariable: 'SSH_PASS'
+                        ),
+                        string(credentialsId: 'deploy-server-host', variable: 'DEPLOY_HOST')
+                    ]) {
+                        sh '''
+                            sshpass -p "${SSH_PASS}" ssh -o StrictHostKeyChecking=no ${SSH_USER}@${DEPLOY_HOST} << 'ENDSSH'
+                                cd /home/VAMPYR/BACKEND_API_VAMPYR/
+                                git pull origin main
+                                cd ..
 
-        stage('Deploy') {
-            steps {
-                echo 'Deploying...'
+                                docker-compose down  
+                                docker-compose up --build -d
+                        '''
+                    }
+                }
             }
         }
     }
